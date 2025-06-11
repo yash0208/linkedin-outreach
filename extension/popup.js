@@ -9,55 +9,58 @@ const debug = (msg, data) => {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    const outputTextarea = document.getElementById('output');
-    const copyButton = document.getElementById('copy');
-    const generateButton = document.getElementById('generate');
-
-    // Listen for messages from background script
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.type === 'GENERATED_MESSAGE') {
-            outputTextarea.value = message.message;
-            generateButton.textContent = 'Generate Message';
-            generateButton.disabled = false;
-            generateButton.classList.remove('loading');
+    // DOM Elements
+    const elements = {
+        output: {
+            textarea: document.getElementById('output'),
+            generate: document.getElementById('generate'),
+            copy: document.getElementById('copy')
+        },
+        referral: {
+            textarea: document.getElementById('referral-output'),
+            generate: document.getElementById('generate-referral'),
+            copy: document.getElementById('copy-referral')
+        },
+        recruiter: {
+            textarea: document.getElementById('recruiter-output'),
+            generate: document.getElementById('generate-recruiter'),
+            copy: document.getElementById('copy-recruiter')
         }
-    });
+    };
 
-    // Copy button functionality
-    copyButton.addEventListener('click', function() {
-        outputTextarea.select();
+    // Helper Functions
+    const copyToClipboard = (textarea, button) => {
+        textarea.select();
         document.execCommand('copy');
         
-        // Visual feedback
-        const originalText = copyButton.textContent;
-        copyButton.textContent = 'Copied!';
-        copyButton.style.backgroundColor = '#28a745';
-        copyButton.style.borderColor = '#28a745';
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.backgroundColor = '#28a745';
+        button.style.borderColor = '#28a745';
         
         setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.style.backgroundColor = '';
-            copyButton.style.borderColor = '';
+            button.textContent = originalText;
+            button.style.backgroundColor = '';
+            button.style.borderColor = '';
         }, 1500);
-    });
+    };
 
-    // Generate button functionality
-    generateButton.addEventListener('click', async function() {
+    const setLoading = (button, isLoading) => {
+        button.textContent = isLoading ? 'Generating' : button.textContent.replace('Generating', 'Generate Message');
+        button.classList.toggle('loading', isLoading);
+        button.disabled = isLoading;
+    };
+
+    const generateMessage = async (endpoint, textarea, button) => {
         try {
-            generateButton.textContent = 'Generating';
-            generateButton.classList.add('loading');
-            generateButton.disabled = true;
-            outputTextarea.value = 'Analyzing profile...';
+            setLoading(button, true);
+            textarea.value = 'Analyzing profile...';
 
-            // Get the current active tab
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-            // Check if we're on LinkedIn
             if (!tab.url.includes('linkedin.com/in/')) {
                 throw new Error('Please navigate to a LinkedIn profile page first.');
             }
 
-            // Send message to content script
             const result = await new Promise((resolve) => {
                 chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_PROFILE' }, (response) => {
                     resolve(response);
@@ -76,9 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`Could not extract profile data. ${debugMsg}`);
             }
 
-            outputTextarea.value = 'Generating message...';
+            textarea.value = 'Generating message...';
 
-            const response = await fetch("http://127.0.0.1:5000/generate", {
+            const response = await fetch(`http://127.0.0.1:5000/${endpoint}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -95,15 +98,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Invalid response from the server.');
             }
 
-            outputTextarea.value = data.message;
+            textarea.value = data.message;
         } catch (error) {
-            outputTextarea.value = `Error: ${error.message}\n\nDebug steps:\n1. Open Chrome DevTools (⌘ + Option + I)\n2. Check Console for detailed logs\n3. Make sure you are on a LinkedIn profile page\n4. Refresh the page and try again`;
+            textarea.value = `Error: ${error.message}\n\nDebug steps:\n1. Open Chrome DevTools (⌘ + Option + I)\n2. Check Console for detailed logs\n3. Make sure you are on a LinkedIn profile page\n4. Refresh the page and try again`;
         } finally {
-            generateButton.textContent = 'Generate Message';
-            generateButton.disabled = false;
-            generateButton.classList.remove('loading');
+            setLoading(button, false);
         }
-    });
+    };
+
+    // Event Listeners
+    elements.output.copy.addEventListener('click', () => copyToClipboard(elements.output.textarea, elements.output.copy));
+    elements.referral.copy.addEventListener('click', () => copyToClipboard(elements.referral.textarea, elements.referral.copy));
+    elements.recruiter.copy.addEventListener('click', () => copyToClipboard(elements.recruiter.textarea, elements.recruiter.copy));
+
+    elements.output.generate.addEventListener('click', () => generateMessage('generate', elements.output.textarea, elements.output.generate));
+    elements.referral.generate.addEventListener('click', () => generateMessage('generate-referral', elements.referral.textarea, elements.referral.generate));
+    elements.recruiter.generate.addEventListener('click', () => generateMessage('generate-recruiter-message', elements.recruiter.textarea, elements.recruiter.generate));
 });
 
 // Function to extract LinkedIn profile data

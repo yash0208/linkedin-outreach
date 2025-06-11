@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Outreach Generator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>LinkedIn Message Generator</title>
+    <link href="vendor/bootstrap.min.css" rel="stylesheet">
+    <link href="vendor/inter.css" rel="stylesheet">
     <style>
         body {
-            width: 450px;
+            width: 500px;
             padding: 20px;
             font-family: 'Inter', sans-serif;
             background-color: #1a1a1a;
@@ -15,13 +15,27 @@
         .container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
+        }
+        .section {
+            background-color: #2d2d2d;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         h3 {
             margin: 0 0 15px 0;
             color: #0a66c2;
             font-weight: 600;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-description {
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 15px;
         }
         textarea {
             width: 100%;
@@ -29,12 +43,13 @@
             border: 1px solid #333;
             border-radius: 8px;
             resize: vertical;
-            background-color: #2d2d2d;
+            background-color: #1a1a1a;
             color: #e0e0e0;
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             line-height: 1.5;
-            min-height: 150px;
+            min-height: 120px;
+            margin-bottom: 15px;
         }
         textarea:focus {
             outline: none;
@@ -53,20 +68,21 @@
             font-weight: 500;
             font-size: 0.95rem;
             transition: all 0.2s ease;
+            flex: 1;
         }
-        #generate {
+        .btn-primary {
             background-color: #0a66c2;
             color: white;
         }
-        #generate:hover {
+        .btn-primary:hover {
             background-color: #004182;
         }
-        #copy {
+        .btn-secondary {
             background-color: #2d2d2d;
             color: #e0e0e0;
             border: 1px solid #404040;
         }
-        #copy:hover {
+        .btn-secondary:hover {
             background-color: #404040;
         }
         button:disabled {
@@ -87,18 +103,62 @@
             40% { content: '..'; }
             60%, 100% { content: '...'; }
         }
+        .icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h3>LinkedIn Outreach Message</h3>
-        <textarea id="output" rows="8" placeholder="Your personalized message will appear here..."></textarea>
-        <div class="button-container">
-            <button id="generate" class="btn btn-primary">Generate Message</button>
-            <button id="copy" class="btn btn-secondary">Copy</button>
+        <div class="section">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                    <path d="M7 12h2v5H7zm4-3h2v8h-2zm4-3h2v11h-2z"/>
+                </svg>
+                Connection Request
+            </h3>
+            <div class="section-description">Generate a personalized connection request message based on the profile.</div>
+            <textarea id="output" rows="6" placeholder="Your personalized connection request will appear here..."></textarea>
+            <div class="button-container">
+                <button id="generate" class="btn btn-primary">Generate Message</button>
+                <button id="copy" class="btn btn-secondary">Copy</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4h2v4zm0-6h-2V7h2v4z"/>
+                </svg>
+                Referral Request
+            </h3>
+            <div class="section-description">Generate a referral request message for the job opportunity.</div>
+            <textarea id="referral-output" rows="6" placeholder="Your referral request message will appear here..."></textarea>
+            <div class="button-container">
+                <button id="generate-referral" class="btn btn-primary">Generate Referral</button>
+                <button id="copy-referral" class="btn btn-secondary">Copy</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+                Recruiter Message
+            </h3>
+            <div class="section-description">Generate a message for recruiters to express interest in opportunities.</div>
+            <textarea id="recruiter-output" rows="6" placeholder="Your recruiter message will appear here..."></textarea>
+            <div class="button-container">
+                <button id="generate-recruiter" class="btn btn-primary">Generate Message</button>
+                <button id="copy-recruiter" class="btn btn-secondary">Copy</button>
+            </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/bootstrap.bundle.min.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

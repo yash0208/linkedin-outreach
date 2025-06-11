@@ -9,9 +9,14 @@
     "storage",
     "tabs"
   ],
-  "host_permissions": [
-    "*://*.linkedin.com/*"
-  ],
+ "host_permissions": [
+  "*://*.linkedin.com/*",
+  "http://localhost:5000/*",
+  "http://127.0.0.1:5000/*"
+],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"

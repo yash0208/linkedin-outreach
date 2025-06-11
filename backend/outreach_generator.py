@@ -8,7 +8,7 @@ API_KEY = os.getenv("NVIDIA_API_KEY")
 
 def generate_linkedin_prompt(resume_text, my_profile_text, target_profile_text):
     return f"""
-You are a professional LinkedIn networking coach helping people craft personalized outreach messages.
+You are a professional LinkedIn networking coach helping people craft personalized connection request notes.
 
 Inputs:
 - My Resume:
@@ -21,24 +21,22 @@ Inputs:
 {target_profile_text}
 
 Task:
-Write a concise, personalized message (around 100 words) that:
-1. Starts with a warm greeting
-2. Mentions something specific from their profile that impressed you
-3. Briefly shares that you're exploring new opportunities and looking to learn from experienced professionals
-4. Expresses genuine interest in their expertise and experience
-5. Ends with a polite request for a brief conversation
+Write a **single-paragraph connection request note** (max 300 characters) that:
+
+1. Starts with a friendly and respectful greeting.
+2. Mentions a specific detail from the target person's profile that genuinely impressed me.
+3. Highlights a relevant connection between my background and theirs.
+4. Shows sincere interest in learning from them.
+5. Ends with a humble request to connect or seek quick guidance.
 
 Guidelines:
-- Keep it short and sweet (100 words max)
-- Be authentic and conversational
-- Show you've done your homework by referencing something specific from their profile
-- Focus on your desire to learn and grow
-- Maintain a professional yet friendly tone
-- Avoid generic phrases
-- Make it clear you value their time
-
-Output: Just the message body, no explanations or labels.
+- Message must be **within 300 characters total** (hard limit).
+- Tone should be warm, authentic, and slightly formal — not robotic or overly flattering.
+- Avoid generic phrases; use specifics from the target profile to show effort.
+- Keep it one concise, thoughtful paragraph — no bullet points or sign-offs.
+- No explanations or labels — only return the message body.
 """
+
 
 def call_nemotron_ultra(prompt):
     client = OpenAI(
